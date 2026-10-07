@@ -49,6 +49,6 @@ export default function Home() {
       </article>}
       {!loading && !answer && !error && <div className="empty"><span>✦</span><p>Your notes are ready when you are.<br />Start with a question above.</p></div>}
     </section>
-    <footer><span>POWERED BY YOUR NOTION KNOWLEDGE BASE</span><span>Grounded answers · Always cited</span></footer>
+    <footer><span>POWERED BY - <a className="origin-link" href="https://notes-by-sukhendra.notion.site/Interview-Preparation-6c3979b889f64ed98748dd79b621ccd0" target="_blank" rel="noreferrer">Notion Interview Preparation Notes by Sukhendra </a></span><span>Grounded answers · Always cited</span></footer>
   </main>;
 }
