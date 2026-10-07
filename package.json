@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "proxy": "node scripts/ollama-proxy.mjs"
   },
   "dependencies": {
     "@notionhq/client": "^2.3.0",
