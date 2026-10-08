@@ -12,6 +12,33 @@ export default function Home() {
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState("");
+
+  async function syncKnowledgeBase() {
+    if (syncing) return;
+    setSyncing(true);
+    setSyncMessage("");
+    setError("");
+    try {
+      const res = await fetch("/api/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: "https://notes-by-sukhendra.notion.site/Interview-Preparation-6c3979b889f64ed98748dd79b621ccd0",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || data.detail || "Sync failed.");
+      const targetName = data.storageTarget === "qdrant" ? "Qdrant Cloud" : "knowledge base";
+      setSyncMessage(`✓ Synced ${data.syncedPages} pages to ${targetName} (${data.indexedPassages} passages)`);
+      setTimeout(() => setSyncMessage(""), 7000);
+    } catch (err: any) {
+      setError(err instanceof Error ? err.message : "Unable to sync Notion notes.");
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   async function ask(e?: FormEvent, suggested?: string) {
     e?.preventDefault();
@@ -28,7 +55,21 @@ export default function Home() {
   }
 
   return <main>
-    <nav><a className="brand" href="#top"><span>✦</span> PrepMind</a><div className="status"><i /> Notes connected</div></nav>
+    <nav>
+      <a className="brand" href="#top"><span>✦</span> PrepMind</a>
+      <div className="nav-controls">
+        {syncMessage && <span className="sync-success-pill">{syncMessage}</span>}
+        <button
+          onClick={syncKnowledgeBase}
+          disabled={syncing}
+          className="sync-btn"
+          title="Fetch latest notes from Notion and rebuild RAG knowledge base"
+        >
+          {syncing ? <span className="spinner-small" /> : "↻"} {syncing ? "Updating RAG..." : "Sync Notes"}
+        </button>
+        <div className="status"><i /> Notes connected</div>
+      </div>
+    </nav>
     <section className="hero" id="top">
       <div className="eyebrow">YOUR PERSONAL INTERVIEW COPILOT</div>
       <h1>Ask your notes.<br /><em>Get interview-ready.</em></h1>

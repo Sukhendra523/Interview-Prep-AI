@@ -64,6 +64,58 @@ nav {
     gap: 8px;
 }
 
+.nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.sync-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--forest);
+    font: 11px "DM Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sync-btn:hover:not(:disabled) {
+    background: #eef3ed;
+    border-color: #32836a;
+}
+
+.sync-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.sync-success-pill {
+    font: 11px "DM Mono", monospace;
+    background: #eaf5ec;
+    color: #276738;
+    border: 1px solid #c3e2c6;
+    padding: 4px 10px;
+    border-radius: 12px;
+    animation: fade 0.3s ease;
+}
+
+.spinner-small {
+    display: inline-block;
+    height: 11px;
+    width: 11px;
+    border: 2px solid rgba(23, 69, 55, 0.2);
+    border-top-color: var(--forest);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
 .status i {
     height: 7px;
     width: 7px;

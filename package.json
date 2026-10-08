@@ -7,10 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "proxy": "node scripts/ollama-proxy.mjs"
+    "proxy": "node scripts/ollama-proxy.mjs",
+    "sync": "node scripts/sync-kb.mjs",
+    "migrate:qdrant": "node scripts/migrate-to-qdrant.mjs"
   },
   "dependencies": {
     "@notionhq/client": "^2.3.0",
+    "@qdrant/js-client-rest": "^1.19.0",
     "@supabase/supabase-js": "^2.49.4",
     "next": "^15.2.0",
     "openai": "^4.86.1",

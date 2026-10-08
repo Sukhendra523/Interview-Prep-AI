@@ -3,18 +3,36 @@ import path from "path";
 
 export type IndexedChunk = { pageId: string; title: string; url: string; content: string; embedding: number[] };
 const indexPath = path.join(process.cwd(), "data", "notion-index.json");
-const ollamaUrl = (process.env.OLLAMA_BASE_URL || '').replace(/\/$/, "");
-const embedModel = process.env.OLLAMA_EMBED_MODEL;
-const chatModel = process.env.OLLAMA_CHAT_MODEL;
+const primaryUrl = (process.env.OLLAMA_BASE_URL || "").replace(/\/$/, "");
+const localUrl = (process.env.OLLAMA_LOCAL_URL || "http://127.0.0.1:11434").replace(/\/$/, "");
+const embedModel = process.env.OLLAMA_EMBED_MODEL || "nomic-embed-text";
+const chatModel = process.env.OLLAMA_CHAT_MODEL || "qwen2.5:3b";
 
 async function ollama(endpoint: string, body: object) {
+  const apiKey = (process.env.OLLAMA_API_KEY || "").trim();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (process.env.OLLAMA_API_KEY) {
-    headers["Authorization"] = `Bearer ${process.env.OLLAMA_API_KEY}`;
+  if (apiKey) {
+    headers["Authorization"] = `Bearer ${apiKey}`;
   }
-  const response = await fetch(`${ollamaUrl}${endpoint}`, { method: "POST", headers, body: JSON.stringify(body) });
-  if (!response.ok) throw new Error(`Ollama error ${response.status}: ${await response.text()}`);
-  return response.json();
+
+  const urlsToTry = Array.from(new Set([primaryUrl, localUrl].filter(Boolean)));
+  let lastError: any = null;
+
+  for (const url of urlsToTry) {
+    try {
+      const response = await fetch(`${url}${endpoint}`, { method: "POST", headers, body: JSON.stringify(body) });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Ollama error ${response.status} from ${url}: ${errorText}`);
+      }
+      return await response.json();
+    } catch (err) {
+      lastError = err;
+      // If there are other URLs to try, continue fallback
+    }
+  }
+
+  throw lastError || new Error("Failed to connect to Ollama.");
 }
 export async function embed(input: string | string[]) { return (await ollama("/api/embed", { model: embedModel, input })).embeddings as number[][]; }
 export async function answer(question: string, context: string) {
